@@ -3,36 +3,36 @@ from user_login.models import User
 from foodgram_app.models import Recipe
 
 
-class Follow(models.Model):
-    follower = models.ForeignKey(
+class Shoping(models.Model):
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follower',
-        verbose_name='Подписчик'
+        related_name='shop_cart',
+        verbose_name='Пользователь'
     )
-    author = models.ForeignKey(
-        User,
+    recipe = models.ForeignKey(
+        Recipe,
         on_delete=models.CASCADE,
-        related_name='following',
-        verbose_name='Автор'
+        related_name='shopping_carts',
+        verbose_name='Рецепт'
+    )
+    added_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата добавления'
     )
 
     class Meta:
-        verbose_name = 'Подписка'
-        verbose_name_plural = 'Подписки'
+        verbose_name = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'author'],
-                name='unique_follow'
-            ),
-            models.CheckConstraint(
-                check=~models.Q(user=models.F('author')),
-                name='prevent_self_follow'
+                fields=['user', 'recipe'],
+                name='unique_shop'
             )
         ]
+        ordering = ['-added_at']
 
     def __str__(self):
-        return f'{self.user} подписан на {self.author}'
+        return f'{self.user} добавил {self.recipe} в список покупок'
 
 
 class Favorite(models.Model):
@@ -61,8 +61,8 @@ class Favorite(models.Model):
                 fields=['user', 'recipe'],
                 name='unique_favorite'
             )
-        ],
-        ordering = ['-date_joined']
+        ]
+        ordering = ['-added_at']
 
     def __str__(self):
         return f'{self.user} добавил {self.recipe} в избранное'

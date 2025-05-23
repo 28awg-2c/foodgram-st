@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+
+def about(request):
+    return HttpResponse("Страница 'О проекте'")
+
+
+def tech(request):
+    return HttpResponse("Страница 'Технологии'")
