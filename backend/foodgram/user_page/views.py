@@ -7,14 +7,13 @@ from .serializers import IngredientSerializer
 class IngredientView(generics.ListAPIView):
     serializer_class = IngredientSerializer
     permission_classes = [AllowAny]
-    pagination_class = None  # Отключаем пагинацию согласно документации
+    pagination_class = None
 
     def get_queryset(self):
         queryset = Ingredient.objects.all()
         name = self.request.query_params.get('name')
 
         if name:
-            # Ищем ингредиенты, у которых name начинается с переданной строки (регистронезависимо)
             queryset = queryset.filter(name__istartswith=name)
 
         return queryset.order_by('name')

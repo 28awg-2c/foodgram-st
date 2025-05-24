@@ -1,6 +1,4 @@
 from rest_framework import serializers
-# from django.contrib.auth import get_user_model
-# from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from user_login.models import User, Follow
@@ -8,26 +6,20 @@ from user_page.models import Recipe
 from django.db import IntegrityError
 from django.core.validators import RegexValidator, MaxLengthValidator
 
+
 class RecipeShortSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
-        # Предполагается, что у вас есть такой сериализатор
         fields = ['id', 'name', 'image', 'cooking_time']
 
 
 class RecipeMinifiedSerializer(serializers.ModelSerializer):
-    """
-    Упрощенный сериализатор для рецептов в подписках
-    """
     class Meta:
         model = Recipe
         fields = ['id', 'name', 'image', 'cooking_time']
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для подписки на пользователя
-    """
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
@@ -42,11 +34,9 @@ class SubscribeSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_is_subscribed(self, obj):
-        # Для этого сериализатора всегда True, так как вызывается после подписки
         return True
 
     def get_recipes(self, obj):
-        #request = self.context.get('request')
         recipes_limit = self.context.get('recipes_limit')
 
         recipes = Recipe.objects.filter(author=obj)
@@ -95,14 +85,14 @@ class UserWithRecipesSerializer(serializers.ModelSerializer):
             except ValueError:
                 pass
 
-        serializer = RecipeShortSerializer(recipes, many=True, context=self.context)
+        serializer = RecipeShortSerializer(
+            recipes, many=True, context=self.context)
         return serializer.data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
 
     def get_is_subscribed(self, obj):
-        # Для подписок всегда True, так как это список подписок текущего пользователя
         return True
 
 
@@ -125,7 +115,8 @@ class UserReadSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get("request")
         if request and request.user.is_authenticated:
-            return Follow.objects.filter(follower=request.user, author=obj).exists()
+            return Follow.objects.filter(follower=request.user,
+                                         author=obj).exists()
         return False
 
     def get_avatar(self, obj):
@@ -140,15 +131,18 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r'^[\w.@+-]+\Z',
-                message='Имя пользователя может содержать только буквы, цифры и символы @/./+/-/_',
+                message='''
+                Имя пользователя может содержать буквы, цифры
+                и символы @/./+/-/_''',
                 code='invalid_username'
             ),
             MaxLengthValidator(
                 limit_value=150,
-                message='Имя пользователя должно содержать не более 150 символов'
+                message='Имя пользователя должно быть не более 150 символов'
             )
         ]
     )
+
     class Meta:
         model = User
         fields = ("id", "username", "email",
@@ -161,7 +155,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Пользователь с таким именем уже существует")
+            raise serializers.ValidationError(
+                "Пользователь с таким именем уже существует")
         return value
 
     def create(self, validated_data):
@@ -169,7 +164,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             user = User.objects.create_user(**validated_data)
             return user
         except IntegrityError as e:
-            raise serializers.ValidationError({"detail": "Ошибка при создании пользователя"})
+            raise serializers.ValidationError(
+                {"detail": "Ошибка при создании пользователя"})
 
 
 class PasswordChangeSerializer(serializers.ModelSerializer):
@@ -183,13 +179,10 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # Проверка на наличие обязательных полей
         if not data.get('current_password') or not data.get('new_password'):
             raise serializers.ValidationError({
-                "detail": "Both 'current_password' and 'new_password' are required."
+                "detail": "Both current and new password are required."
             })
-
-        # Валидация сложности нового пароля
         try:
             validate_password(data['new_password'], self.context['user'])
         except ValidationError as e:

@@ -2,7 +2,11 @@ from rest_framework import generics, status, permissions, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Recipe
 from user_page.models import Shoping, Favorite
-from .serializers import RecipeListSerializer, RecipeCreateSerializer, RecipeShortSerializer
+from .serializers import (
+    RecipeListSerializer,
+    RecipeCreateSerializer,
+    RecipeShortSerializer
+)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -12,6 +16,7 @@ from rest_framework.views import APIView
 from reportlab.pdfgen import canvas
 from io import BytesIO
 from django.http import HttpResponse
+
 
 class RecipeOneView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Recipe.objects.all()
@@ -36,7 +41,8 @@ class RecipeOneView(generics.RetrieveUpdateDestroyAPIView):
 
     def check_object_permissions(self, request, obj):
         super().check_object_permissions(request, obj)
-        if request.method in ['PATCH', 'DELETE'] and obj.author != request.user:
+        if (request.method in ['PATCH', 'DELETE']
+                and obj.author != request.user):
             self.permission_denied(
                 request,
                 message="Вы не являетесь автором этого рецепта",
@@ -92,29 +98,16 @@ class RecipeOneView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class RecipeShortLinkView(viewsets.ViewSet):
-    """
-    Отдельный ViewSet для работы с короткими ссылками на рецепты
-    """
     queryset = Recipe.objects.all()
     lookup_field = 'id'
-    permission_classes = [permissions.AllowAny]  # Или другие permissions по необходимости
+    permission_classes = [permissions.AllowAny]
 
     @action(detail=True, methods=['get'], url_path='short-link')
     def get_short_link(self, request, id=None):
-        """
-        Получение короткой ссылки на рецепт
-        ---
-        parameters:
-            - name: id
-              required: true
-              type: string
-              paramType: path
-              description: ID рецепта
-        """
         try:
             recipe = self.queryset.get(id=id)
             short_link = f"{settings.BASE_URL}/api/recipes/{recipe.id}"
-            
+
             return Response(
                 {"short-link": short_link},
                 status=status.HTTP_200_OK
@@ -127,9 +120,9 @@ class RecipeShortLinkView(viewsets.ViewSet):
 
 
 class CustomPagination(PageNumberPagination):
-    page_size = 6  # Дефолтное количество элементов на странице
-    page_size_query_param = 'limit'  # Параметр для изменения количества
-    max_page_size = 100 
+    page_size = 6
+    page_size_query_param = 'limit'
+    max_page_size = 100
 
     def get_paginated_response(self, data):
         return Response({
@@ -142,7 +135,6 @@ class CustomPagination(PageNumberPagination):
 
 class RecipeView(generics.ListCreateAPIView):
     queryset = Recipe.objects.all().order_by('-id')
-    #queryset = Recipe.objects.all()
     pagination_class = CustomPagination
     permission_classes = [AllowAny]
 
@@ -154,7 +146,6 @@ class RecipeView(generics.ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method == "POST":
             return RecipeCreateSerializer
-        # else:
         return RecipeListSerializer
 
     def get_queryset(self):
@@ -166,10 +157,12 @@ class RecipeView(generics.ListCreateAPIView):
 
         if 'is_favorited' in params and params['is_favorited'] == '1':
             if self.request.user.is_authenticated:
-                queryset = queryset.filter(in_favorites__user=self.request.user)
+                queryset = queryset.filter(
+                    in_favorites__user=self.request.user)
                 print(queryset)
 
-        if 'is_in_shopping_cart' in params and params['is_in_shopping_cart'] == '1':
+        if ('is_in_shopping_cart' in params
+                and params['is_in_shopping_cart'] == '1'):
             if self.request.user.is_authenticated:
                 queryset = queryset.filter(
                     shopping_carts__user=self.request.user)
@@ -177,7 +170,6 @@ class RecipeView(generics.ListCreateAPIView):
         return queryset
 
     def list(self, request, *args, **kwargs):
-        # Обработка параметра limit
         if limit := request.query_params.get('limit'):
             try:
                 self.pagination_class.page_size = int(limit)
@@ -209,9 +201,6 @@ class RecipeView(generics.ListCreateAPIView):
 
 
 class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
-    """
-    Добавление рецепта в список покупок
-    """
     permission_classes = [IsAuthenticated]
     serializer_class = RecipeShortSerializer
     lookup_url_kwarg = 'id'
@@ -219,49 +208,37 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
     def create(self, request, *args, **kwargs):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
-        
-        # Проверяем существование рецепта
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        
-        # Проверяем, не добавлен ли уже рецепт
         if Shoping.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'detail': 'Рецепт уже есть в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Создаем запись в списке покупок
         shopping_item = Shoping.objects.create(user=user, recipe=recipe)
-        
-        # Сериализуем рецепт для ответа
+
         serializer = self.get_serializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
-        
-        # Проверяем существование рецепта
+
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        
-        # Пытаемся найти запись в списке покупок
-        shopping_item = Shoping.objects.filter(user=user, recipe=recipe).first()
-        
+
+        shopping_item = Shoping.objects.filter(
+            user=user, recipe=recipe).first()
+
         if not shopping_item:
             return Response(
                 {'detail': 'Рецепта нет в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Удаляем запись
+
         shopping_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
-    """
-    Добавление рецепта в избранное
-    """
     permission_classes = [IsAuthenticated]
     serializer_class = RecipeShortSerializer
     lookup_url_kwarg = 'id'
@@ -269,90 +246,72 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
     def create(self, request, *args, **kwargs):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
-        
-        # Проверяем существование рецепта
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        
-        # Проверяем, не добавлен ли уже рецепт в избранное
+
         if Favorite.objects.filter(user=user, recipe=recipe).exists():
             return Response(
                 {'detail': 'Рецепт уже есть в избранном'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Создаем запись в избранном
         Favorite.objects.create(user=user, recipe=recipe)
-        
-        # Сериализуем рецепт для ответа
+
         serializer = self.get_serializer(recipe)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, *args, **kwargs):
-        """Удаление рецепта из избранного"""
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
-        
-        # Проверяем существование рецепта
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        
-        # Пытаемся найти запись в избранном
         favorite = Favorite.objects.filter(user=user, recipe=recipe).first()
-        
+
         if not favorite:
             return Response(
                 {'detail': 'Рецепта нет в избранном'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Удаляем запись
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class DownloadShoppingCartView(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, request, format=None):
-        # Получаем все рецепты в списке покупок пользователя
-        shopping_items = Shoping.objects.filter(user=request.user).select_related('recipe')
-        
+        shopping_items = Shoping.objects.filter(
+            user=request.user).select_related('recipe')
+
         if not shopping_items.exists():
             return Response(
                 {'detail': 'Ваш список покупок пуст'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Собираем все ингредиенты с количеством
         ingredients = {}
         for item in shopping_items:
             recipe = item.recipe
             for ingredient in recipe.recipe_ingredient.all():
-                key = (ingredient.ingredient.name, 
+                key = (ingredient.ingredient.name,
                        ingredient.ingredient.measurement_unit)
                 if key in ingredients:
                     ingredients[key] += ingredient.amount
                 else:
                     ingredients[key] = ingredient.amount
-        
-        # Определяем формат из параметра запроса (по умолчанию PDF)
+
         file_format = request.query_params.get('format', 'pdf').lower()
-        
+
         if file_format == 'txt':
             return self._generate_txt_file(ingredients)
         elif file_format == 'csv':
             return self._generate_csv_file(ingredients)
         else:
             return self._generate_pdf_file(ingredients)
-    
+
     def _generate_pdf_file(self, ingredients):
         buffer = BytesIO()
         p = canvas.Canvas(buffer)
-        
-        # Заголовок документа
         p.setFont("Helvetica-Bold", 16)
         p.drawString(100, 800, "Список покупок")
         p.setFont("Helvetica", 12)
-        
+
         y_position = 750
         for (name, unit), amount in ingredients.items():
             p.drawString(100, y_position, f"- {name}: {amount} {unit}")
@@ -360,28 +319,31 @@ class DownloadShoppingCartView(APIView):
             if y_position < 50:
                 p.showPage()
                 y_position = 750
-        
+
         p.save()
         buffer.seek(0)
-        
+
         response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="shopping_list.pdf"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_list.pdf"')
         return response
-    
+
     def _generate_txt_file(self, ingredients):
         content = "Список покупок:\n\n"
         for (name, unit), amount in ingredients.items():
             content += f"- {name}: {amount} {unit}\n"
-        
+
         response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename="shopping_list.txt"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_list.txt"')
         return response
-    
+
     def _generate_csv_file(self, ingredients):
         content = "Ингредиент,Количество,Единица измерения\n"
         for (name, unit), amount in ingredients.items():
             content += f"{name},{amount},{unit}\n"
-        
+
         response = HttpResponse(content, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="shopping_list.csv"'
+        response['Content-Disposition'] = (
+            'attachment; filename="shopping_list.csv"')
         return response
