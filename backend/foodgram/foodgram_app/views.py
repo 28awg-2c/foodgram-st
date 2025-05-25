@@ -296,7 +296,7 @@ class DownloadShoppingCartView(APIView):
                 else:
                     ingredients[key] = ingredient.amount
 
-        file_format = request.query_params.get('format', 'pdf').lower()
+        file_format = request.query_params.get('format', 'txt').lower()
 
         if file_format == 'txt':
             return self._generate_txt_file(ingredients)

@@ -1,0 +1,262 @@
+[
+  {
+    "author_email": "chef1@example.com",
+    "name": "Спагетти Карбонара",
+    "image": "recipes/carbonara.jpg",
+    "text": "Классические спагетти с беконом и соусом из яиц",
+    "cooking_time": 25,
+    "components": [
+      {"name": "спагетти", "amount": 300},
+      {"name": "бекон", "amount": 150},
+      {"name": "яйца куриные", "amount": 3},
+      {"name": "пармезан", "amount": 50}
+    ]
+  },
+  {
+    "author_email": "chef2@example.com",
+    "name": "Греческий салат",
+    "image": "recipes/greek_salad.jpg",
+    "text": "Свежий салат с фетой и оливками",
+    "cooking_time": 15,
+    "components": [
+      {"name": "помидоры", "amount": 200},
+      {"name": "огурцы", "amount": 200},
+      {"name": "фета", "amount": 100},
+      {"name": "оливки", "amount": 50}
+    ]
+  },
+  {
+    "author_email": "baker@example.com",
+    "name": "Шоколадный торт",
+    "image": "recipes/chocolate_cake.jpg",
+    "text": "Нежный бисквитный торт с шоколадным кремом",
+    "cooking_time": 90,
+    "components": [
+      {"name": "мука", "amount": 250},
+      {"name": "какао", "amount": 50},
+      {"name": "сахар", "amount": 200},
+      {"name": "яйца куриные", "amount": 4}
+    ]
+  },
+  {
+    "author_email": "vegan@example.com",
+    "name": "Фалафель",
+    "image": "recipes/falafel.jpg",
+    "text": "Жареные шарики из нута с пряностями",
+    "cooking_time": 40,
+    "components": [
+      {"name": "нут", "amount": 200},
+      {"name": "лук", "amount": 1},
+      {"name": "чеснок", "amount": 3},
+      {"name": "кинза", "amount": 20}
+    ]
+  },
+  {
+    "author_email": "chef1@example.com",
+    "name": "Маргарита пицца",
+    "image": "recipes/pizza_margherita.jpg",
+    "text": "Классическая итальянская пицца с томатами и моцареллой",
+    "cooking_time": 30,
+    "components": [
+      {"name": "тесто для пиццы", "amount": 250},
+      {"name": "томатный соус", "amount": 100},
+      {"name": "моцарелла", "amount": 150},
+      {"name": "базилик", "amount": 10}
+    ]
+  },
+  {
+    "author_email": "asian@example.com",
+    "name": "Курица терияки",
+    "image": "recipes/teriyaki.jpg",
+    "text": "Курица в сладко-соленом соусе терияки",
+    "cooking_time": 35,
+    "components": [
+      {"name": "куриное филе", "amount": 400},
+      {"name": "соус терияки", "amount": 50},
+      {"name": "кунжут", "amount": 10},
+      {"name": "рис", "amount": 200}
+    ]
+  },
+  {
+    "author_email": "breakfast@example.com",
+    "name": "Авокадо тост",
+    "image": "recipes/avocado_toast.jpg",
+    "text": "Тост с пюре из авокадо и яйцом пашот",
+    "cooking_time": 10,
+    "components": [
+      {"name": "хлеб", "amount": 2},
+      {"name": "авокадо", "amount": 1},
+      {"name": "яйца куриные", "amount": 2},
+      {"name": "лимонный сок", "amount": 5}
+    ]
+  },
+  {
+    "author_email": "breakfast@example.com",
+    "name": "Тыквенный суп-пюре",
+    "image": "recipes/pumpkin_soup.jpg",
+    "text": "Нежный крем-суп из запеченной тыквы",
+    "cooking_time": 45,
+    "components": [
+      {"name": "тыква", "amount": 500},
+      {"name": "сливки", "amount": 100},
+      {"name": "лук", "amount": 1},
+      {"name": "имбирь", "amount": 10}
+    ]
+  },
+  {
+    "author_email": "breakfast@example.com",
+    "name": "Тирамису",
+    "image": "recipes/tiramisu.jpg",
+    "text": "Итальянский десерт с кофе и маскарпоне",
+    "cooking_time": 60,
+    "components": [
+      {"name": "маскарпоне", "amount": 250},
+      {"name": "печенье савоярди", "amount": 200},
+      {"name": "кофе", "amount": 100},
+      {"name": "какао", "amount": 20}
+    ]
+  },
+  {
+    "author_email": "bbq@example.com",
+    "name": "Стейк из лосося",
+    "image": "recipes/salmon_steak.jpg",
+    "text": "Лосось на гриле с лимоном и травами",
+    "cooking_time": 20,
+    "components": [
+      {"name": "лосось", "amount": 300},
+      {"name": "лимон", "amount": 0.5},
+      {"name": "оливковое масло", "amount": 20},
+      {"name": "укроп", "amount": 10}
+    ]
+  },
+  {
+    "author_email": "bbq@example.com",
+    "name": "Киноа с овощами",
+    "image": "recipes/quinoa.jpg",
+    "text": "Питательный салат с киноа и сезонными овощами",
+    "cooking_time": 25,
+    "components": [
+      {"name": "киноа", "amount": 150},
+      {"name": "болгарский перец", "amount": 1},
+      {"name": "огурец", "amount": 1},
+      {"name": "оливковое масло", "amount": 30}
+    ]
+  },
+  {
+    "author_email": "bbq@example.com",
+    "name": "Борщ",
+    "image": "recipes/borscht.jpg",
+    "text": "Традиционный украинский борщ со сметаной",
+    "cooking_time": 120,
+    "components": [
+      {"name": "свекла", "amount": 2},
+      {"name": "говядина", "amount": 300},
+      {"name": "капуста", "amount": 200},
+      {"name": "сметана", "amount": 50}
+    ]
+  },
+  {
+    "author_email": "bbq@example.com",
+    "name": "Овсянка с ягодами",
+    "image": "recipes/oatmeal.jpg",
+    "text": "Полезный завтрак с овсяными хлопьями и свежими ягодами",
+    "cooking_time": 10,
+    "components": [
+      {"name": "овсяные хлопья", "amount": 80},
+      {"name": "молоко", "amount": 200},
+      {"name": "мед", "amount": 20},
+      {"name": "ягоды", "amount": 100}
+    ]
+  },
+  {
+    "author_email": "indian@example.com",
+    "name": "Чана масала",
+    "image": "recipes/chana_masala.jpg",
+    "text": "Острое индийское блюдо из нута с пряностями",
+    "cooking_time": 50,
+    "components": [
+      {"name": "нут", "amount": 200},
+      {"name": "помидоры", "amount": 300},
+      {"name": "имбирь", "amount": 20},
+      {"name": "куркума", "amount": 5}
+    ]
+  },
+  {
+    "author_email": "french@example.com",
+    "name": "Рататуй",
+    "image": "recipes/ratatouille.jpg",
+    "text": "Овощное рагу по-провански",
+    "cooking_time": 60,
+    "components": [
+      {"name": "баклажаны", "amount": 2},
+      {"name": "кабачки", "amount": 2},
+      {"name": "помидоры", "amount": 3},
+      {"name": "базилик", "amount": 10}
+    ]
+  },
+  {
+    "author_email": "japanese@example.com",
+    "name": "Роллы Калифорния",
+    "image": "recipes/california_roll.jpg",
+    "text": "Роллы с крабовым мясом и авокадо",
+    "cooking_time": 40,
+    "components": [
+      {"name": "рис для суши", "amount": 200},
+      {"name": "крабовое мясо", "amount": 100},
+      {"name": "авокадо", "amount": 1},
+      {"name": "нори", "amount": 3}
+    ]
+  },
+  {
+    "author_email": "japanese@example.com",
+    "name": "Гуакамоле",
+    "image": "recipes/guacamole.jpg",
+    "text": "Мексиканская закуска из авокадо с чили",
+    "cooking_time": 15,
+    "components": [
+      {"name": "авокадо", "amount": 2},
+      {"name": "помидор", "amount": 1},
+      {"name": "лук", "amount": 0.5},
+      {"name": "перец чили", "amount": 5}
+    ]
+  },
+  {
+    "author_email": "japanese@example.com",
+    "name": "Лазанья",
+    "image": "recipes/lasagna.jpg",
+    "text": "Многослойная паста с мясным соусом и бешамель",
+    "cooking_time": 75,
+    "components": [
+      {"name": "листы лазаньи", "amount": 12},
+      {"name": "фарш говяжий", "amount": 400},
+      {"name": "сыр моцарелла", "amount": 200},
+      {"name": "томатный соус", "amount": 300}
+    ]
+  },
+  {
+    "author_email": "summer@example.com",
+    "name": "Гаспачо",
+    "image": "recipes/gazpacho.jpg",
+    "text": "Охлажденный испанский томатный суп",
+    "cooking_time": 20,
+    "components": [
+      {"name": "помидоры", "amount": 500},
+      {"name": "огурец", "amount": 1},
+      {"name": "чеснок", "amount": 2},
+      {"name": "оливковое масло", "amount": 50}
+    ]
+  },
+  {
+    "author_email": "kids@example.com",
+    "name": "Банановые панкейки",
+    "image": "recipes/pancakes.jpg",
+    "text": "Пышные панкейки с бананом и шоколадной крошкой",
+    "cooking_time": 25,
+    "components": [
+      {"name": "мука", "amount": 150},
+      {"name": "банан", "amount": 2},
+      {"name": "яйца куриные", "amount": 2},
+      {"name": "шоколадные капли", "amount": 50}
+    ]
+  }
+]

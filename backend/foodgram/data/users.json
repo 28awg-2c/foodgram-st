@@ -1,0 +1,98 @@
+[
+  {
+    "username": "chef1",
+    "email": "chef1@example.com",
+    "password": "carbonara123",
+    "first_name": "Итальянский",
+    "last_name": "Шеф",
+    "avatar": "avatars/chef1.jpg"
+  },
+  {
+    "username": "chef2",
+    "email": "chef2@example.com",
+    "password": "salad456",
+    "first_name": "Греческий",
+    "last_name": "Кулинар",
+    "avatar": "avatars/chef2.jpg"
+  },
+  {
+    "username": "baker",
+    "email": "baker@example.com",
+    "password": "chocolatecake",
+    "first_name": "Кондитер",
+    "last_name": "Сладкоежкин",
+    "avatar": "avatars/baker.jpg"
+  },
+  {
+    "username": "vegan",
+    "email": "vegan@example.com",
+    "password": "falafel2023",
+    "first_name": "Веган",
+    "last_name": "Здоровья",
+    "avatar": "avatars/vegan.jpg"
+  },
+  {
+    "username": "asian",
+    "email": "asian@example.com",
+    "password": "teriyaki88",
+    "first_name": "Азиатский",
+    "last_name": "Гурман",
+    "avatar": "avatars/asian.jpg"
+  },
+  {
+    "username": "breakfast",
+    "email": "breakfast@example.com",
+    "password": "morning123",
+    "first_name": "Завтрак",
+    "last_name": "Любимый",
+    "avatar": "avatars/breakfast.jpg"
+  },
+  {
+    "username": "bbq",
+    "email": "bbq@example.com",
+    "password": "grillmaster",
+    "first_name": "Барбекю",
+    "last_name": "Мастер",
+    "avatar": "avatars/bbq.jpg"
+  },
+  {
+    "username": "indian",
+    "email": "indian@example.com",
+    "password": "masala777",
+    "first_name": "Индийский",
+    "last_name": "Повар",
+    "avatar": "avatars/indian.jpg"
+  },
+  {
+    "username": "french",
+    "email": "french@example.com",
+    "password": "ratatouille",
+    "first_name": "Французский",
+    "last_name": "Гастроном",
+    "avatar": "avatars/french.jpg"
+  },
+  {
+    "username": "japanese",
+    "email": "japanese@example.com",
+    "password": "sushi123",
+    "first_name": "Японский",
+    "last_name": "Сушист",
+    "avatar": "avatars/japanese.jpg"
+  },
+  {
+    "username": "summer",
+    "email": "summer@example.com",
+    "password": "gazpacho2023",
+    "first_name": "Летний",
+    "last_name": "Кулинар",
+    "avatar": "avatars/summer.jpg"
+  },
+  {
+    "username": "kids",
+    "email": "kids@example.com",
+    "password": "pancakes!",
+    "first_name": "Детский",
+    "last_name": "Повар",
+    "avatar": "avatars/kids.jpg"
+  }
+]
