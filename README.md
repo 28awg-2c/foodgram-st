@@ -6,22 +6,9 @@ git clone git@github.com:28awg-2c/foodgram-st.git
 cd foodgram-st
 ```
 
-### 2. Создайте `.env` файл
+### 2. `.env` файл
 
-Создайте файл `infra/.env` подходящие для прохождения тестов:
-
-```env
-# PostgreSQL настройки
-POSTGRES_DB=foodgram
-POSTGRES_USER=anast
-POSTGRES_PASSWORD=anastanast
-POSTGRES_HOST=foodgram_diploma_db
-POSTGRES_PORT=5432
-
-# Django настройки
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-```
+Файл `infra/.env` уже создан и содержит все секреты:
 
 ### 3. Соберите и запустите контейнеры
 
