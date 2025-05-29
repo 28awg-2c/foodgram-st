@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from user_login.models import User, Follow
+from user_login.models import User
 from user_page.models import Recipe
 from django.db import IntegrityError
 from django.core.validators import RegexValidator, MaxLengthValidator
@@ -53,7 +53,7 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ).data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return obj.recipe.count()
 
     def get_avatar(self, obj):
         if obj.avatar:
@@ -90,7 +90,7 @@ class UserWithRecipesSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+        return obj.recipe.count()
 
     def get_is_subscribed(self, obj):
         return True
@@ -115,8 +115,7 @@ class UserReadSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get("request")
         if request and request.user.is_authenticated:
-            return Follow.objects.filter(follower=request.user,
-                                         author=obj).exists()
+            return request.user.following.exists(author=obj)
         return False
 
     def get_avatar(self, obj):
