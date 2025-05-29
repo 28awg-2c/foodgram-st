@@ -1,6 +1,6 @@
 from rest_framework import generics, status, permissions, viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Recipe
+from .models import Recipe, RecipeIngredient
 from user_page.models import Shoping, Favorite
 from .serializers import (
     RecipeListSerializer,
@@ -13,9 +13,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from django.conf import settings
 from rest_framework.views import APIView
-from reportlab.pdfgen import canvas
-from io import BytesIO
 from django.http import HttpResponse
+from django.db.models import Sum
 
 
 class RecipeOneView(generics.RetrieveUpdateDestroyAPIView):
@@ -159,7 +158,6 @@ class RecipeView(generics.ListCreateAPIView):
             if self.request.user.is_authenticated:
                 queryset = queryset.filter(
                     in_favorites__user=self.request.user)
-                print(queryset)
 
         if ('is_in_shopping_cart' in params
                 and params['is_in_shopping_cart'] == '1'):
@@ -209,7 +207,7 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        if Shoping.objects.filter(user=user, recipe=recipe).exists():
+        if Shoping.shop_cart.exists(recipe=recipe):
             return Response(
                 {'detail': 'Рецепт уже есть в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -225,8 +223,7 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
 
         recipe = get_object_or_404(Recipe, id=recipe_id)
 
-        shopping_item = Shoping.objects.filter(
-            user=user, recipe=recipe).first()
+        shopping_item = Shoping.shop_cart.first(recipe=recipe)
 
         if not shopping_item:
             return Response(
@@ -248,7 +245,7 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
 
-        if Favorite.objects.filter(user=user, recipe=recipe).exists():
+        if Favorite.favorites.exists(recipe=recipe):
             return Response(
                 {'detail': 'Рецепт уже есть в избранном'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -262,7 +259,7 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        favorite = Favorite.objects.filter(user=user, recipe=recipe).first()
+        favorite = Favorite.favorites.first(recipe=recipe)
 
         if not favorite:
             return Response(
@@ -277,56 +274,32 @@ class DownloadShoppingCartView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        shopping_items = Shoping.objects.filter(
-            user=request.user).select_related('recipe')
+        shopping_items = Shoping.shop_cart.select_related('recipe')
 
         if not shopping_items.exists():
             return Response(
                 {'detail': 'Ваш список покупок пуст'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        ingredients = {}
-        for item in shopping_items:
-            recipe = item.recipe
-            for ingredient in recipe.recipe_ingredient.all():
-                key = (ingredient.ingredient.name,
-                       ingredient.ingredient.measurement_unit)
-                if key in ingredients:
-                    ingredients[key] += ingredient.amount
-                else:
-                    ingredients[key] = ingredient.amount
+        ingredient_data = (
+            RecipeIngredient.objects
+            .filter(recipe__shop_cart__user=request.user)
+            .select_related('ingredient')
+            .values(
+                'ingredient__name',
+                'ingredient__measurement_unit'
+            )
+            .annotate(total_amount=Sum('amount'))
+            .order_by('ingredient__name')
+        )
 
-        file_format = request.query_params.get('format', 'txt').lower()
+        ingredients = {
+            (item['ingredient__name'],
+             item['ingredient__measurement_unit']): item['total_amount']
+            for item in ingredient_data
+        }
 
-        if file_format == 'txt':
-            return self._generate_txt_file(ingredients)
-        elif file_format == 'csv':
-            return self._generate_csv_file(ingredients)
-        else:
-            return self._generate_pdf_file(ingredients)
-
-    def _generate_pdf_file(self, ingredients):
-        buffer = BytesIO()
-        p = canvas.Canvas(buffer)
-        p.setFont("Helvetica-Bold", 16)
-        p.drawString(100, 800, "Список покупок")
-        p.setFont("Helvetica", 12)
-
-        y_position = 750
-        for (name, unit), amount in ingredients.items():
-            p.drawString(100, y_position, f"- {name}: {amount} {unit}")
-            y_position -= 20
-            if y_position < 50:
-                p.showPage()
-                y_position = 750
-
-        p.save()
-        buffer.seek(0)
-
-        response = HttpResponse(buffer, content_type='application/pdf')
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_list.pdf"')
-        return response
+        return self._generate_txt_file(ingredients)
 
     def _generate_txt_file(self, ingredients):
         content = "Список покупок:\n\n"
@@ -336,14 +309,4 @@ class DownloadShoppingCartView(APIView):
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = (
             'attachment; filename="shopping_list.txt"')
-        return response
-
-    def _generate_csv_file(self, ingredients):
-        content = "Ингредиент,Количество,Единица измерения\n"
-        for (name, unit), amount in ingredients.items():
-            content += f"{name},{amount},{unit}\n"
-
-        response = HttpResponse(content, content_type='text/csv')
-        response['Content-Disposition'] = (
-            'attachment; filename="shopping_list.csv"')
         return response
