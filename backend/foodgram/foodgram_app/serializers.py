@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Recipe, RecipeIngredient, Ingredient
+from django.core.validators import MinValueValidator, MaxValueValidator
 import base64
 import uuid
 from django.core.files.base import ContentFile
@@ -26,7 +27,10 @@ class Base64ImageField(serializers.ImageField):
 class IngredientInRecipeWriteSerializer(serializers.Serializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     amount = serializers.IntegerField(
-        max_value=MAX_COOK_AND_AMOUNT, min_value=MIN_COOK_AND_AMOUNT)
+        validators=[
+            MinValueValidator(MIN_COOK_AND_AMOUNT),
+            MaxValueValidator(MAX_COOK_AND_AMOUNT)
+        ])
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -82,8 +86,10 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
     cooking_time = serializers.SerializerMethodField(
-        max_value=MAX_COOK_AND_AMOUNT,
-        min_value=MIN_COOK_AND_AMOUNT)
+        validators=[
+            MinValueValidator(MIN_COOK_AND_AMOUNT),
+            MaxValueValidator(MAX_COOK_AND_AMOUNT)
+        ])
 
     class Meta:
         model = Recipe

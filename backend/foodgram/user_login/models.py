@@ -87,7 +87,6 @@ class Follow(models.Model):
                 name='prevent_self_follow'
             )
         ]
-        ordering = ['-date_joined']
 
     def __str__(self):
         return f'{self.follower} подписан на {self.author}'

@@ -1,5 +1,6 @@
 from django.db import models
 from user_login.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 MIN_COOK_AND_AMOUNT = 1
 MAX_COOK_AND_AMOUNT = 32000
@@ -40,8 +41,10 @@ class Recipe(models.Model):
         verbose_name='Ингредиенты'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления', max_value=MAX_COOK_AND_AMOUNT,
-        min_value=MIN_COOK_AND_AMOUNT)
+        verbose_name='Время приготовления', validators=[
+            MinValueValidator(MIN_COOK_AND_AMOUNT),
+            MaxValueValidator(MAX_COOK_AND_AMOUNT)
+        ])
 
     class Meta:
         ordering = ['-id']
@@ -60,8 +63,10 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
                                    verbose_name='Ингредиент')
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Кол-во ингредиента', max_value=MAX_COOK_AND_AMOUNT,
-        min_value=MIN_COOK_AND_AMOUNT)
+        verbose_name='Кол-во ингредиента', validators=[
+            MinValueValidator(MIN_COOK_AND_AMOUNT),
+            MaxValueValidator(MAX_COOK_AND_AMOUNT)
+        ])
 
     class Meta:
         ordering = ['recipe']
