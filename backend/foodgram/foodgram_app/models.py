@@ -40,8 +40,8 @@ class Recipe(models.Model):
         verbose_name='Ингредиенты'
     )
     cooking_time = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления', min_length=MIN_COOK_AND_AMOUNT,
-        max_length=MAX_COOK_AND_AMOUNT)
+        verbose_name='Время приготовления', max_value=MAX_COOK_AND_AMOUNT,
+        min_value=MIN_COOK_AND_AMOUNT)
 
     class Meta:
         ordering = ['-id']
@@ -60,8 +60,8 @@ class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE,
                                    verbose_name='Ингредиент')
     amount = models.PositiveSmallIntegerField(
-        verbose_name='Кол-во ингредиента', min_length=MIN_COOK_AND_AMOUNT,
-        max_length=MAX_COOK_AND_AMOUNT)
+        verbose_name='Кол-во ингредиента', max_value=MAX_COOK_AND_AMOUNT,
+        min_value=MIN_COOK_AND_AMOUNT)
 
     class Meta:
         ordering = ['recipe']

@@ -5,6 +5,9 @@ import uuid
 from django.core.files.base import ContentFile
 from user_login.serializers import UserReadSerializer
 
+MIN_COOK_AND_AMOUNT = 1
+MAX_COOK_AND_AMOUNT = 32000
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
@@ -22,7 +25,8 @@ class Base64ImageField(serializers.ImageField):
 
 class IngredientInRecipeWriteSerializer(serializers.Serializer):
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
-    amount = serializers.IntegerField(min_value=1)
+    amount = serializers.IntegerField(
+        max_value=MAX_COOK_AND_AMOUNT, min_value=MIN_COOK_AND_AMOUNT)
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -77,6 +81,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    cooking_time = serializers.SerializerMethodField(
+        max_value=MAX_COOK_AND_AMOUNT,
+        min_value=MIN_COOK_AND_AMOUNT)
 
     class Meta:
         model = Recipe
@@ -99,10 +106,6 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                 'ingredients': 'Ингредиенты не должны повторяться'
             })
 
-        if 'cooking_time' in data and data['cooking_time'] < 1:
-            raise serializers.ValidationError({
-                'cooking_time': 'Время приготовления не менее 1 минуты'
-            })
         return data
 
     def create(self, validated_data):
@@ -112,12 +115,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             **validated_data
         )
 
-        for ingredient_data in ingredients_data:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient=ingredient_data['id'],
-                amount=ingredient_data['amount']
-            )
+        self._create_ingredient_relations(recipe, ingredients_data)
 
         return recipe
 
@@ -137,7 +135,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         instance.save()
 
     def _refresh_recipe_ingredients(self, recipe, ingredients_data):
-        RecipeIngredient.objects.filter(recipe=recipe).delete()
+        RecipeIngredient.recipe_ingredient.all().delete()
 
         self._create_ingredient_relations(recipe, ingredients_data)
 
