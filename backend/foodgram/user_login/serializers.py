@@ -115,7 +115,7 @@ class UserReadSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get("request")
         if request and request.user.is_authenticated:
-            return request.user.following.exists(author=obj)
+            return request.user.following.filter(author=obj)
         return False
 
     def get_avatar(self, obj):

@@ -211,7 +211,7 @@ class SubscribeView(generics.CreateAPIView, generics.DestroyAPIView):
 
         author = get_object_or_404(User, id=author_id)
 
-        if user.follower.exists(author=author):
+        if user.follower.filter(author=author):
             raise ValidationError(
                 {'detail': 'Вы уже подписаны на этого пользователя'},
                 code=status.HTTP_400_BAD_REQUEST
@@ -229,7 +229,7 @@ class SubscribeView(generics.CreateAPIView, generics.DestroyAPIView):
 
         author = get_object_or_404(User, id=id)
 
-        follow = user.follower.first(author=author)
+        follow = user.follower.filter(author=author)
         if not follow:
             return Response(
                 {'detail': 'Вы не подписаны на этого пользователя'},
