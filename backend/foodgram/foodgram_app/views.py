@@ -207,7 +207,7 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        if Shoping.shop_cart.exists(recipe=recipe):
+        if recipe.shop_cart.filter(user=user).exists():
             return Response(
                 {'detail': 'Рецепт уже есть в списке покупок'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -223,8 +223,7 @@ class ShoppingCartView(generics.CreateAPIView, generics.DestroyAPIView):
 
         recipe = get_object_or_404(Recipe, id=recipe_id)
 
-        shopping_item = Shoping.shop_cart.first(recipe=recipe)
-
+        shopping_item = recipe.shop_cart.filter(user=user)
         if not shopping_item:
             return Response(
                 {'detail': 'Рецепта нет в списке покупок'},
@@ -245,7 +244,7 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
 
-        if Favorite.favorites.exists(recipe=recipe):
+        if recipe.favorites.filter(user=user).exists():
             return Response(
                 {'detail': 'Рецепт уже есть в избранном'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -259,7 +258,7 @@ class FavoriteView(generics.CreateAPIView, generics.DestroyAPIView):
         user = request.user
         recipe_id = self.kwargs.get(self.lookup_url_kwarg)
         recipe = get_object_or_404(Recipe, id=recipe_id)
-        favorite = Favorite.favorites.first(recipe=recipe)
+        favorite = recipe.favorites.filter(user=user)
 
         if not favorite:
             return Response(
